@@ -7,7 +7,7 @@ window.toml = (function(){
 		tabWidth: 4
 	}
 		
-	var acceptedNameChars = '^ \\t\\[\\]';
+	var wrongNameChars = ' \\t\\[\\]';
 
 	/*
 	 * 	
@@ -18,7 +18,7 @@ window.toml = (function(){
 			// Whitespace followed by [ or [[
 			'^([ \\t]*)' + '\\[(\\[?)' +
 			// At least one name character
-			'([' + acceptedNameChars+ ']+)' +
+			'([^' + wrongNameChars+ ']+)' +
 			// ] or ]] followed by an optional comment
 			'\\](\\]?)' + '(?: |\\t)*' + '(?:#.*)?$'
 		);
@@ -41,7 +41,7 @@ window.toml = (function(){
 			// Matches Whitespace
 			'^(?:[ \\t]*)' +
 			// At least one name character
-			'([' + acceptedNameChars + ']+)' +
+			'([^#' + wrongNameChars + ']+)' +
 			// Whitespace, equals and the Assignment
 			'(?:[ \\t]*)' + '=' + '(.*)$');
 
@@ -78,9 +78,9 @@ window.toml = (function(){
 	function parseValue(string, name){
 
 		// Breakets balanced
-		var opening = string.split(/\{|\(|\[/g).length;
+		/*var opening = string.split(/\{|\(|\[/g).length;
 		var closing = string.split(/\}|\)|\]/g).length;
-		if(opening !== closing)return false;
+		if(opening !== closing)return false;*/
 
 		// Validate Ending
 		var last = string.substr(string.length - 1);
@@ -142,6 +142,8 @@ window.toml = (function(){
 			if(value){
 				store(result, lastTable, lastName, value);
 			}else{
+				console.log("rest:")
+				console.log(previous);
 				//throw		
 			}
 		}
