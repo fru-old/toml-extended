@@ -122,72 +122,72 @@ pavlov.specify('Toml Extended', function(){
 		});
 	});
 
-	describe('RegEx - filterComments', function(){
+	describe('RegEx - filterValue', function(){
 
 		it('should match empty string', function(){
 			var string = '';
 			var comment = '#comment';
-			assert(toml.regex.filterComments(string+comment)).isSameAs(string);
+			assert(toml.regex.filterValue(string+comment)).isSameAs(string.trim());
 		});
 
 		it('simple test case', function(){
 			var string = ' ';
 			var comment = '#comment';
-			assert(toml.regex.filterComments(string+comment)).isSameAs(string);
+			assert(toml.regex.filterValue(string+comment)).isSameAs(string.trim());
 		});
 		
 		it('should match statements', function(){
 			var string = ' asdasd test ';
 			var comment = '#comment';
-			assert(toml.regex.filterComments(string+comment)).isSameAs(string);
+			assert(toml.regex.filterValue(string+comment)).isSameAs(string.trim());
 		});
 
 		it('a double quoted string', function(){
 			var string = ' "test" ';
 			var comment = '#comment';
-			assert(toml.regex.filterComments(string+comment)).isSameAs(string);
+			assert(toml.regex.filterValue(string+comment)).isSameAs(string.trim());
 		});
 
 		it('should ignore hashes in strings', function(){
 			var string = ' "tes#t" ';
 			var comment = '#comment';
-			assert(toml.regex.filterComments(string+comment)).isSameAs(string);
+			assert(toml.regex.filterValue(string+comment)).isSameAs(string.trim());
 		});
 		
 		it('should match multiple comments and strings', function(){
 			var string = ' "tes#t"  "##test" "test#" ';
 			var comment = '#comment';
-			assert(toml.regex.filterComments(string+comment)).isSameAs(string);
+			assert(toml.regex.filterValue(string+comment)).isSameAs(string.trim());
 		});
 
 		it('should match escaped quote simple test case', function(){
 			var string = ' "\\"" ';
 			var comment = '#comment';
-			assert(toml.regex.filterComments(string+comment)).isSameAs(string);
+			assert(toml.regex.filterValue(string+comment)).isSameAs(string.trim());
 		});
 
 		it('should match escaped char that us no quote', function(){
 			var string = ' "\\g" ';
 			var comment = '#comment';
-			assert(toml.regex.filterComments(string+comment)).isSameAs(string);
+			assert(toml.regex.filterValue(string+comment)).isSameAs(string.trim());
 		});
 
 		it('should match multiple comments and strings and quots', function(){
 			var string = ' "te\\"s#t"  "##t\\g\\"est" "te\\u3456st#" ';
 			var comment = '#comment';
-			assert(toml.regex.filterComments(string+comment)).isSameAs(string);
+			assert(toml.regex.filterValue(string+comment)).isSameAs(string.trim());
 		});
 
 		it('should match multiple # in comment', function(){
 			var string = ' "te\\"s#t"  "##t\\g\\"est" "te\\u3456st#" ';
 			var comment = '#comment #dsfsdf "';
-			assert(toml.regex.filterComments(string+comment)).isSameAs(string);
+			assert(toml.regex.filterValue(string+comment)).isSameAs(string.trim());
 		});
 
 		it('should match multiple # in comment complex', function(){
 			var string = ' "te\\"s#t"  "##t\\g\\"est" "te\\u3456st#" ';
 			var comment = '#comment #  asadsa as#asdasd #sad  \\ " \\"  "';
-			assert(toml.regex.filterComments(string+comment)).isSameAs(string);
+			assert(toml.regex.filterValue(string+comment)).isSameAs(string.trim());
 		});
 	});
 });
