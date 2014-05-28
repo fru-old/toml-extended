@@ -78,9 +78,10 @@ window.toml = (function(){
 	function parseValue(string, name){
 
 		// Breakets balanced
-		/*var opening = string.split(/\{|\(|\[/g).length;
-		var closing = string.split(/\}|\)|\]/g).length;
-		if(opening !== closing)return false;*/
+		var filtered = string.replace(/"(?:[^\\"]|(?:\\.))*"/g, '');
+		var opening = filtered.split(/\{|\(|\[/g).length;
+		var closing = filtered.split(/\}|\)|\]/g).length;
+		if(opening !== closing)return false;
 
 		// Validate Ending
 		var last = string.substr(string.length - 1);
