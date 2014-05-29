@@ -112,7 +112,25 @@ pavlov.specify('Toml Extended', function(){
 
 		it('simple test case', function(){
 			var string = 'test=test';
-			var result = { name: 'test', value: 'test'};
+			var result = { name: 'test', value: 'test', func: 0};
+			assert(toml.regex.isAssignment(string)).isSameAs(result);
+		});
+
+		it('function in value', function(){
+			var string = 'test=#{test';
+			var result = { name: 'test', value: 'test', func: 1};
+			assert(toml.regex.isAssignment(string)).isSameAs(result);
+		});
+
+		it('observable in value', function(){
+			var string = 'test=#{{test';
+			var result = { name: 'test', value: 'test', func: 2};
+			assert(toml.regex.isAssignment(string)).isSameAs(result);
+		});
+
+		it('no observable in value', function(){
+			var string = 'test=##{{test';
+			var result = { name: 'test', value: '##{{test', func: 0};
 			assert(toml.regex.isAssignment(string)).isSameAs(result);
 		});
 

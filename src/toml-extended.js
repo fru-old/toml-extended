@@ -43,11 +43,12 @@ window.toml = (function(){
 			// At least one name character
 			'([^#' + wrongNameChars + ']+)' +
 			// Whitespace, equals and the Assignment
-			'(?:[ \\t]*)' + '=' + '(.*)$');
+			'(?:[ \\t]*)' + '=' + '(?:[ \\t]*)(#\\{\\{?)?' + '(.*)$');
 
 		var match = regex.exec(line);
-		if(match && match.length === 3){
-			return {name: match[1], value: match[2]};
+		if(match && match.length === 4){
+			var func = (match[2] || '').length - 1;
+			return {name: match[1], value: match[3], func: (func<0?0:func) };
 		}
 		return false;
 	}
@@ -75,7 +76,7 @@ window.toml = (function(){
 	/*
 	 * @see http://jsperf.com/count-the-number-of-characters-in-a-string
 	 */
-	function parseValue(string, name){
+	function parseValue(string, assignment){
 
 		// Breakets balanced
 		var filtered = string.replace(/"(?:[^\\"]|(?:\\.))*"/g, '');
@@ -87,10 +88,12 @@ window.toml = (function(){
 		var last = string.substr(string.length - 1);
 		if(last === ',')return false;
 
+		var key = '"'+assignment.name.replace(/"/g,'\\"')+'"';
+
 		// Validate using json / function
 		try{
 			// TODO #{} or #{{}}
-			string = '{"test":' + string + '}';
+			string = '{'+key+':' + string + '}';
 			return JSON.stringify(string);
 		}catch(e){
 			return false;
@@ -105,8 +108,8 @@ window.toml = (function(){
 		var previous = '';
 		var result = {};
 		var lastTable = null;
-		var lastName = null;
-		var lastLine = 0;
+		var lastAssignment = null;
+		var pastTables = [];
 
 		for(var i = 0; i < lines.length; i++){
 			var line = lines[i];
@@ -116,21 +119,21 @@ window.toml = (function(){
 			if(table || assignment){
 				if(previous){
 					line = filterValue(line);
-					var value = parseValue(previous);
+					var value = parseValue(previous, lastAssignment);
 					if(!value){
 						previous += line;
 						continue;
 					}else{
 						lastName = '';
 						previous = '';
-						store(result, lastTable, lastName, value);
+						store(result, lastTable, value);
 					}
 				}
 				if(table){
 					lastTable = table;
+					table.path = resolvePath(table, pastTables);			
 				}else{
-					lastLine = i;
-					lastName = assignment.name;
+					lastAssignment = assignment;
 					previous = filterValue(assignment.value);
 				}
 			}else{
@@ -139,9 +142,9 @@ window.toml = (function(){
 			}
 		}
 		if(previous){
-			var value = parseValue(previous);
+			var value = parseValue(previous, lastAssignment);
 			if(value){
-				store(result, lastTable, lastName, value);
+				store(result, lastTable, value);
 			}else{
 				console.log("rest:")
 				console.log(previous);
@@ -151,13 +154,28 @@ window.toml = (function(){
 		return result;
 	}
 
+	function resolvePath(table, pastTables){
+		//TODO
+		if(table.name==='.')throw "invalid";
+		var path = table.name.split('.');
+		if(path[0] === ''){
+			var root = [];
+			for(var i = table.indent - 1; i >= 0; i--){
+				if(pastTables[i]){
+					root = pastTables[i];
+					break;
+				}
+			}
+			path = path.splice(1,path.length).concat(root);
+		}
+		return pastTables[table.indent] = path;
+	}
+
 	/*
 	 *
 	 */
-	function store(result, table, name, value){
-		console.log("insert:");
-		console.log(table);
-		console.log(name);
+	function store(result, table, value){
+		console.log(table.path);
 		console.log(value);
 	}
 

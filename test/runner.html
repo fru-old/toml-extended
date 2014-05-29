@@ -199,5 +199,27 @@ test_string = "You'll hate me after this - #"          # " Annoying, isn't it?
 
 </template>
 
+<template id="extended">
+
+[.test]
+  what="this" 
+
+[test]
+  [.test]
+    simple="value"
+
+[.test]
+  [.test]
+    simple="value"
+
+</template>
+
+<template id="extended-expected">
+ 
+// TODO
+
+</template>
+
+
 </body>
 </html>
