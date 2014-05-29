@@ -88,13 +88,11 @@ window.toml = (function(){
 		var last = string.substr(string.length - 1);
 		if(last === ',')return false;
 
-		var key = '"'+assignment.name.replace(/"/g,'\\"')+'"';
-
 		// Validate using json / function
 		try{
 			// TODO #{} or #{{}}
-			string = '{'+key+':' + string + '}';
-			return JSON.stringify(string);
+			string = '{"value":' + string + '}';
+			return JSON.parse(string);
 		}catch(e){
 			return false;
 		}
@@ -107,7 +105,7 @@ window.toml = (function(){
 		var lines = text.split('\n');
 		var previous = '';
 		var result = {};
-		var lastTable = null;
+		var lastTable = {path: []};
 		var lastAssignment = null;
 		var pastTables = [];
 
@@ -126,7 +124,7 @@ window.toml = (function(){
 					}else{
 						lastName = '';
 						previous = '';
-						store(result, lastTable, value);
+						store(result, lastTable, lastAssignment.name, value);
 					}
 				}
 				if(table){
@@ -144,7 +142,7 @@ window.toml = (function(){
 		if(previous){
 			var value = parseValue(previous, lastAssignment);
 			if(value){
-				store(result, lastTable, value);
+				store(result, lastTable, lastAssignment.name, value);
 			}else{
 				console.log("rest:")
 				console.log(previous);
@@ -154,6 +152,9 @@ window.toml = (function(){
 		return result;
 	}
 
+	/*
+	 *
+	 */
 	function resolvePath(table, pastTables){
 		//TODO
 		if(table.name==='.')throw "invalid";
@@ -174,9 +175,15 @@ window.toml = (function(){
 	/*
 	 *
 	 */
-	function store(result, table, value){
-		console.log(table.path);
-		console.log(value);
+	function store(result, table, name, value){
+		for(var i = 0; i < table.path.length; i++){
+			var n = table.path[i];
+			if(!result[n])result[n] = {};
+			result = result[n];
+		}
+		result[name] = value.value;
+		//console.log(table.path);
+		//console.log(name + ": " + value.value);
 	}
 
 

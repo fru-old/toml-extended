@@ -210,13 +210,21 @@ test_string = "You'll hate me after this - #"          # " Annoying, isn't it?
 
 [.test]
   [.test]
-    simple="value"
+    simple2="value"
 
 </template>
 
 <template id="extended-expected">
  
-// TODO
+{
+  "test":{
+    "what": "this",
+    "test":{
+      "simple": "value",
+      "simple2": "value"
+    }
+  }
+}
 
 </template>
 
